@@ -1,0 +1,20 @@
+{
+  "name": "ai-start",
+  "version": "1.0.0",
+  "description": "Start Apps",
+  "main": "index.js",
+  "scripts": {
+    "start-mongodb": "docker run --rm --name mongodb  -p 27017:27017 -d -v ~/dev/mongo:/data/db mongo",
+    "stop-mongodb": "docker stop mongodb",
+    "install-chat-ui": "cd ./scripts && ./install-chat-ui.sh",
+    "update-chat-ui": "cd ../chat-ui && git pull",
+    "start-chat-ui": "cd ../chat-ui && npm run dev -- --host 127.0.0.1",
+    "list-mongodb-collections": "docker exec -i mongodb sh -c 'mongosh --eval \"db.getCollectionNames()\" chat-ui'",
+    "list-conversations": "docker exec -i mongodb sh -c 'mongosh --eval \"db.conversations.find()\" chat-ui'",
+    "drop-database": "docker exec -i mongodb sh -c 'mongosh --eval \"db.dropDatabase()\" chat-ui'",
+    "start-inference": "cd ./scripts && ./start-text-generation-inference.sh",
+    "show-filesystem": "sudo df -Th && echo && sudo lsblk && echo && docker system df"
+  },
+  "author": "",
+  "license": "ISC"
+}

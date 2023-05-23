@@ -1,0 +1,13 @@
+# global
+**local**
+
+# root
+*.run
+
+# open-assistant
+open-assistant/dev/chat-ui
+open-assistant/dev/inference-data
+open-assistant/dev/mongo
+
+
+
