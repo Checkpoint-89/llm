@@ -1,5 +1,7 @@
 # Open-Assistant  
 
+**Based on: https://www.blueantoinette.com/2023/05/09/chatgpt-but-open-sourced-running-huggingchat-locally-vm/**  
+
 ### Set-up Instructions  
 
 **General**  
