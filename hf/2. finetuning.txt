@@ -1,0 +1,57 @@
+Standard Pytorch training
+    - One step is
+        - optimizer = AdamW(model.paramters())
+        - loss = model(**batch).loss
+        - loss.backward()
+        - optimizer.step()
+
+Datasets
+    - from datasets import load_dataset
+        - loads a DatasetDict which is a dictionnary of Datasets (train, validation, test)
+    - A Dataset has the arguments 'features' (~column names) and 'num_rows'
+    - Dataset.features -> typically features are: 'idx', 'label', 'sentence1' and sometimes 'sentence2'
+    - Behind the scenes, label is of type ClassLabel, and the mapping of integers to label name is stored in the names folder.
+    - Tokenizing a Dataset:
+        - Calling the tokenizer on the sentences returns a dictionnary ...
+        - ... to stay with a Dataset class, use the method Dataset.map(tokenize_function, batched=True) 
+        - ... the argument batched=True to exploit the Rust backend and speed up processing of tokenization
+        - ... map will apply tokenize_function (you define it)
+        - ... WATCH: don't pad sequences within tokenize_function !!
+        - ... Multiprocessing is possible with map (num_proc). Not used with the tokenizers from HF because they already use multi-threading.
+
+
+Dynamic padding:
+    - Function responsable for putting together samples inside a batch 'collate_function'
+        - It can be passed as an argument when building a Dataloader
+        - Default collate_function = convert to pytorch tensor and concatenate tensors (recursively if data are sequences)
+    - Padding to the longest sequence in the Dataset: all batches have same shapes - good for TPUs that need batches of fixes shape.
+    - Padding to the longest sequence of the batch: batches have varying shapes - good for CPU and GPU.
+
+
+Fine tuning with the Trainer
+
+    - The traininn parameters are setup by instantiating TrainingArguments
+        - The main parameters that can be setup are:
+            - output_dir: Directory to save the trained model and outputs.
+            - overwrite_output_dir: Whether to overwrite the output_dir if it exists.
+            - num_train_epochs: Number of training epochs.
+            - per_device_train_batch_size: Batch size for training on each device.
+            - per_device_eval_batch_size: Batch size for evaluation on each device.
+            - gradient_accumulation_steps: Number of steps to accumulate gradients before updating parameters.
+            - learning_rate: Learning rate for the optimizer.
+            - weight_decay: Coefficient for weight decay (L2 regularization).
+            - warmup_steps: Number of warm-up steps for the learning rate scheduler.
+            - evaluation_strategy: When to evaluate the model during training (e.g., after each epoch or a specific number of steps).
+
+    This is how to instantiate the Trainer (with an example of type for each parameter)
+    - Trainer(
+        model: BertForSequenceClassification,
+        training_args: TrainingArguments,
+        train_dataset: datasets.arrow_dataset.Dataset,
+        eval_dataset: datasets.arrow_dataset.Dataset,
+        data_collator: transformers.data.data_collator.DataCollatorWithPadding,
+        tokenizer: transformers.models.bert.tokenization_bert_fast.BertTokenizerFast,
+        compute_metrics: function,
+    )
+
+

@@ -1,0 +1,16 @@
+name: hf
+
+channels:
+  - default
+
+dependencies:
+  - python
+  - ipykernel
+  - scikit-learn
+  - scipy
+  - pip
+  - pip:
+    - transformers==4.28.0
+    - datasets
+    - accelerate
+    - evaluate

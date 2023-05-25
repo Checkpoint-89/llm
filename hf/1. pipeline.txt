@@ -1,0 +1,72 @@
+Terminology (clarification)
+    - Architecture: skeleton of the model
+    - Checkpoints: weights to be loaded in an Architecture
+    - Model: can mean both
+
+Transformer types:
+    - GPT-like = auto-regressive
+    - BERT-like = auto-encoding
+    - BART/T5-like: seq2seq
+
+Type of training:
+    - Pretraining: training a model from scratch
+    - Fine-tuning
+    - Causal language modeling
+    - Masked language modeling
+
+Zero-, one-, few shot classifiction
+    - In the context of LLM, a task where the objective is
+    - described in a prompt, followed by 0, 1 or many examples.
+    - LLM ar few shot learners: https://arxiv.org/abs/2005.14165
+    - Generalization capabilities seems to emerge when #param > 100 M
+
+Architecture:
+    - Encoder only: embeds the input (ALBERT, BERT, DistilBERT, ELECTRA, RoBERTa)
+    - Decoder only: genrate text with only the input as constraint (CTRL, GPT, GPT-2, Transformer XL)
+    - Encoder Decoder: seq to seq (BART, mBART, Marian, T5)
+
+
+Use models with HF
+    - The path to the model description can be provided as a checkpoint or as a path to a local file
+    - The description shall contain the config.json file and a the pytorch_model.bin
+    - The config.json file contains:
+        - The config class, which contains
+            - The config file and the
+            - Model class
+    - The Model class and its config file allow to instantiate the model
+    - The pytoch_model.bin file allow to initialize the model with the pretrained weights
+
+    - Use AutoConfig, AutoTokenizer, AutoModel or with specialized head for instance: AutoModelForSequenceClassification
+    - method to load checkpoints: .from_pretrained()
+    - method to save a model: .save_pretrained() -> config.json (the architecture); pytorch_model.bin (the weights)
+
+
+Tokenizers:
+    - Most SOTA tokenizers use subwords tokenization
+    - BERT uses the wordpiece algorithm, XLNet and ALBERT the Unigram algorithm and GPT-2 and Roberta the Byte Pair Encoding algorithm.
+    - Loading end Saving tokenizers use the same methods as config and models: AutoTokenizer.from_pretrained() and AutoTokenizer.save_pretrained()
+    - The output of the Tokenizer is a dictionnary with three arguments: 
+        - 'input_ids', 'token_type_ids', 'attention_mask'
+    - Important parameters:
+        - padding='longest' -> will pad the sequence up to the max sequence length
+        - padding='max_length' -> will pad the sequence up to the model max length
+        - padding='max_length', max_length=8 -> will pad the sequence up to the specified max length
+        - truncation=True -> will truncate the sequences that are longer than the model max length
+        - max_length=8, truncation=True -> will truncate the sequences that are longer than the specified max length
+        - return_tensors='pt' | 'tf' | 'np'
+
+
+The Tokenizer Pipeline:
+    - tokenizer = Autotokenizer.from_pretrained("checkpoint") [will download the vocabulary]
+    - Split subwords: tokens = tokenizer.tokenize(raw data)
+    - Add special characters
+    - Convert to input IDs: tokenizer.convert_tokens_to_ids(tokens)
+
+
+Batching Sequences
+    - Truncate sequences that are longer than the model input size
+        - or use specialized models such Longformer or LED
+    - Pad sequences that are shorter than the longest sequence
+    - Padding token id: tokenizer.pad_token_id
+    - The attention_mask output of the Tokenizer are used to inform the model not to pay attention to padding
+    - The token_type_ids output of the Tokenizer are used to inform the model about the tokens. For instance, when processing pairs of sentences, it will indicate whether the token belongs to the first or second sentence.
