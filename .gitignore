@@ -3,11 +3,17 @@
 
 # root
 *.run
+.vscode
 
 # open-assistant
 open-assistant/dev/chat-ui
 open-assistant/dev/inference-data
 open-assistant/dev/mongo
+
+# hf
+hf/models
+hf/test-trainer
+
 
 
 
