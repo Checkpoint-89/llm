@@ -39,6 +39,7 @@ Use models with HF
     - Use AutoConfig, AutoTokenizer, AutoModel or with specialized head for instance: AutoModelForSequenceClassification
     - method to load checkpoints: .from_pretrained()
     - method to save a model: .save_pretrained() -> config.json (the architecture); pytorch_model.bin (the weights)
+    - NOTE: all transformers model will return the loss when labels are provided.
 
 
 Tokenizers:
