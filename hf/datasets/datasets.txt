@@ -1,0 +1,29 @@
+Loading Datasets: main methods from datasets
+    - load_dataset: 
+        - if the split is defined: returns a Dataset
+        - else: returns a DatasetDict
+        - argument streaming=True: returns an iterable ...
+        - ... one can get a subset of the iterable dataset with the method take()
+    - load_dataset_builder: load information about the Datasets without actually loading the data
+        - load_dataset_builder().info is a DatasetInfo with information such as descriptions, features, size
+    - get_dataset_split_names: returns the splits available: train, validation, test
+    - get_dataset_config_names: when datatsets have subsets, one shall select which subset to download or get an error
+
+Access data in the Dataset:
+    - A dataset can be access through natural slicing and indexing operations
+    - Indexing order matters: dataset[0]['text'] will be quicker than dataset["text"][0]...
+    - ... because it retrieves all columns first.
+
+Preprocesssing datasets 
+    - Tokenizing
+        - directly: returns a dictionnary
+        - with map: returns a Dataset
+    - Use the set_format() function to set the dataset format to be compatible with PyTorch
+    - Check how to resample audio file
+    - Check how to perform data augmentation in image files
+
+Creating Dataset 
+    - Check how to create image/ video or audio datasets with a low code approach
+    
+
+
