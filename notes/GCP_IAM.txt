@@ -1,0 +1,122 @@
+----------------------------------------------------------
+                    AUTHENTICATION
+----------------------------------------------------------
+
+How to authenticate depending on your use case:
+https://cloud.google.com/docs/authentication
+
+Identity:
+    - def: needed for users and workloads to be recognized by google cloud and use it
+    - doc: https://cloud.google.com/iam/docs/google-identities
+    - a user identity can be:
+        - cloud identity account
+        - google workspace account
+        - federation using cloud identity or google workspace (2 accounts neede: ext and int)
+        - workforce identity federation (1 account needed)
+    - a workload identity can be:
+        - attached service account
+        - short-liver service account credentials
+        - google kubernetes engines workload identity
+        - workload identity federation (workload outside GC)
+        - service account key
+
+Application Default Credentials (ADC):
+  - What is it ?
+    - doc: https://cloud.google.com/docs/authentication/provide-credentials-adc
+    - strategy used by the Google authentication libraries to automatically find credentials based on the application environement.
+    - the librairies make the credentials available to Cloud Client Librairies and Google API Librairies
+    - recommended authentication services for code using Google Cloud services
+    - it uses different credentials than those of for the gcloud CLI
+
+  - How to get credentials:
+    - doc: https://cloud.google.com/docs/authentication/provide-credentials-adc#how-to
+    - code runs on your local machine: 
+      - use user credentials (credentials associated with your Google Account)
+      - 'gcloud auth application-default login' provides your local ADC credentials
+      - after you log in, your credentials are stored in the local credential file used by ADC
+      - this is different from 'gcloud auth login' which provides your gcloud credentials 
+    - code runs on a compute engine or google cloud service supporting a service account
+      - it will use the credentials provided by that account
+      - best practice
+        - create a custom service account, do not use the default one
+
+  - How it works:
+    doc: https://cloud.google.com/docs/authentication/application-default-credentials
+
+----------------------------------------------------------
+                    AUTHORIZATION
+----------------------------------------------------------
+Principal = WHO can access
+    - def: an entity that can be authenticated and authorized to access a Resource
+    - cod: 
+        - user:ali@example.com
+        - serviceAccount:my-other-app@appspot.gserviceaccount.com
+        - group:admins@example.com
+        - domain:google.com
+           the Principal concept is used in the context of access management
+    - doc: https://cloud.google.com/iam/docs/overview#concepts_related_identity
+    - 5 types of principals:
+        - google account for end users
+        - service account for applications and compute workload
+        - google group
+        - G Suite domain
+        - cloud identity domain
+
+----------------------------------------------------------
+Roles = WHAT can be accessed for WHAT operations
+    - def: a collection of Permissions defining what operations are allowed on what Resource
+    - cod: roles/service.roleName -> roles/storage.objectAdmin, roles/storage.objectCreator, roles/storage.objectViewer
+    - doc: https://cloud.google.com/iam/docs/understanding-roles
+    - 3 types of roles
+        - basic roles: historical Cloud Console roles = Owner, Editor, Viewer
+        - predefined roles: finer-grained access control than basic roles.
+        - custom roles
+    - which role 
+    - how to choose predefined roles: https://cloud.google.com/iam/docs/choose-predefined-roles
+    - how to define custom roles: https://cloud.google.com/iam/docs/creating-custom-roles
+
+Resource: 
+    - can be a project, compute engine instance, cloud storage bucket, etc
+
+Resoure hierarchy:
+    - organization / folder / project / resource of google cloud services
+    - allow Policies can be set at any level of the hierarchy
+    - children resources inherits from parent's policies
+
+Permission:
+    - def: determines what operations are allowed on a Resource
+    - doc: https://cloud.google.com/iam/docs/permissions-reference
+    - Permissions are granted through the attachment of Roles with that Permission to Principals through Policies
+    - Permissions are represented in the form of 'service.resource.verb', for example, 'pubsub.subscriptions.consume'
+
+----------------------------------------------------------
+IAM Policy or Allow Policy: WHO can access WHAT to do WHAT
+    - def: a collection of roles binding. A role binding binds one or more principals to individual roles.
+    - cod: check example at the bottom of the file
+    - for instance a Policy could be the collection of:
+        - Principals: google account + service account <=> Role: App Engine Admin
+        - Principals: google group + could identity domain <=> to Role: Logs Viewer
+    => The Policy should then be attached to a Resource to constrain the Principals to their Role on that Resource
+
+Example of IAM Policy
+{
+  "bindings": [
+    {
+      "role": "roles/storage.objectAdmin",
+      "members": [
+        "user:ali@example.com",
+        "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+        "group:admins@example.com",
+        "domain:google.com"
+      ]
+    },
+    {
+      "role": "roles/storage.objectViewer",
+      "members": [
+        "user:maria@example.com"
+      ]
+    }
+  ]
+}
+
+----------------------------------------------------------

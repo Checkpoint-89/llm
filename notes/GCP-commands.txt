@@ -1,0 +1,8 @@
+Filter through pattern matching
+    - gcloud iam service-accounts list --filter "email~.vicuna." 
+
+List all resources to which a specific service account is attached
+    - gcloud asset search-all-iam-policies --flatten="bindings[].members" --filter="bindings.members.serviceAccount:%@VICUNA%"
+
+Change the service account for an instance
+    - gcloud compute instances set-service-account instance-1 --service-account=%@VICUNA% 
