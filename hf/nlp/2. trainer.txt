@@ -34,14 +34,14 @@ Fine tuning with the Trainer
         - The main parameters that can be setup are:
             - output_dir: Directory to save the trained model and outputs.
             - overwrite_output_dir: Whether to overwrite the output_dir if it exists.
-            - num_train_epochs: Number of training epochs.
-            - per_device_train_batch_size: Batch size for training on each device.
-            - per_device_eval_batch_size: Batch size for evaluation on each device.
-            - gradient_accumulation_steps: Number of steps to accumulate gradients before updating parameters.
-            - learning_rate: Learning rate for the optimizer.
-            - weight_decay: Coefficient for weight decay (L2 regularization).
-            - warmup_steps: Number of warm-up steps for the learning rate scheduler.
-            - evaluation_strategy: When to evaluate the model during training (e.g., after each epoch or a specific number of steps).
+            - num_train_epochs: Number of training epochs. (3)
+            - per_device_train_batch_size: Batch size for training on each device. (8)
+            - per_device_eval_batch_size: Batch size for evaluation on each device. (8)
+            - gradient_accumulation_steps: Number of steps to accumulate gradients before updating parameters. (1)
+            - learning_rate: Learning rate for the optimizer. (5e-5)
+            - weight_decay: Coefficient for weight decay (L2 regularization). (0)
+            - warmup_steps: Number of warm-up steps for the learning rate scheduler. (0)
+            - evaluation_strategy: When to evaluate the model during training - e.g., after each epoch or a specific number of steps. ("no")
 
     This is how to instantiate the Trainer (with an example of type for each parameter)
     - Trainer(

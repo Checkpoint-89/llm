@@ -64,7 +64,7 @@ def preprocess_orig_data(path_to_galactica_folder ,path_to_ds, clean=False):
     dataset = load_dataset('json', data_files=str(orig_path))
 
     # Preprocess the dataset
-    tgt_cols = ['_label', 'id', 'title', 'text']
+    tgt_cols = ['_labels', 'id', 'title', 'text']
 
     # Preprocess dataset: standardize column names
     src_cols = list(dataset['train'].features.keys())
@@ -83,26 +83,26 @@ def preprocess_orig_data(path_to_galactica_folder ,path_to_ds, clean=False):
 
     # Preprocess dataset: encode labels
     # Labels are defined by the train split
-    labels = np.unique(dataset['train']['_label'])
+    labels = np.unique(dataset['train']['_labels'])
     label2id = {label: i for i, label in enumerate(labels)}
     label2id['[UNK]'] = -1
     id2label = {i: label for i, label in enumerate(labels)}
     id2label[-1] = '[UNK]'
 
-    dataset = dataset.map(lambda seq: {'label': label2id[seq['_label']] if seq['_label'] in label2id.keys() else -1})
+    dataset = dataset.map(lambda seq: {'labels': label2id[seq['_labels']] if seq['_labels'] in label2id.keys() else -1})
     for split in dataset.keys():
         if split != 'train':
-            dataset[split] = dataset = dataset.map(lambda seq: {'_label': id2label[seq['label']]})
+            dataset[split] = dataset = dataset.map(lambda seq: {'_labels': id2label[seq['labels']]})
 
     #TODO: Add distribution statistics as metadata to the dataset
 
     # Preprocess dataset: cast to features
     features = Features({
-    '_label': ClassLabel(num_classes=len(label2id.keys()), names=list(label2id.keys())),
+    '_labels': ClassLabel(num_classes=len(label2id.keys()), names=list(label2id.keys())),
     'id': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None),
     'title': Value(dtype='string', id=None),
     'text': Value(dtype='string', id=None),
-    'label': ClassLabel(num_classes=len(label2id.values()), names=list(label2id.values())),
+    'labels': ClassLabel(num_classes=len(label2id.values()), names=list(label2id.values())),
     })
     dataset = dataset.cast(features)
 

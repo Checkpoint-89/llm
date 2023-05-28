@@ -1,0 +1,4 @@
+First simple tricks to cope with a cuda out of memory error  
+    - clean gpu memory with: torch.cuda.empty_cache()  
+    - reduce number of sequences per batch during training and evaluation  
+    - reduce the number of hidden layers  
