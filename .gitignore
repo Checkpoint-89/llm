@@ -5,6 +5,7 @@ __pycache__
 # root
 *.run
 .vscode
+vm.ipynb
 
 # open-assistant
 open-assistant/dev/chat-ui
@@ -17,7 +18,9 @@ hf/test-trainer
 
 # galactica
 galactica/data
-
+galactica/model
+galactica/test-trainer
+galactica/test.ipynb
 
 
 

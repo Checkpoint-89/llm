@@ -36,12 +36,10 @@ def rename_ds_columns(dataset, src_cols, tgt_cols):
 def preprocess_orig_data(path_to_galactica_folder ,path_to_ds, clean=False):
     """
     Preprocess the original data provided by Chiper Icon
-    Inputs
-    - ../data/raw_applications.json
-    - ../data/raw_is_experimental.json
+    Inputs, paths to
+    - /galactica/data/orig_applications.json or /galactica/data/orig_is_experimental.json
     Outputs
-    - ../data/applications.json
-    - ../data/is_experimental.json
+    - /galactica/data/raw_applications.json or /galactica/data/raw_is_experimental.json
     """
     # Identify the data
     if Path(path_to_ds) == Path(r'./data/orig_applications.json'):
@@ -59,7 +57,7 @@ def preprocess_orig_data(path_to_galactica_folder ,path_to_ds, clean=False):
 
     # Cleaning
     if clean:
-        shutil.rmtree(raw_path)
+        shutil.rmtree(raw_path, ignore_errors=True)
     
     # Load the data
     orig_path = Path(path_to_galactica_folder, path_to_ds)
