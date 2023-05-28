@@ -1,5 +1,6 @@
 # global
 **local**
+__pycache__
 
 # root
 *.run
