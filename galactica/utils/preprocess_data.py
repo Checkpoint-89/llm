@@ -41,7 +41,9 @@ def preprocess_orig_data(path_to_galactica_folder ,path_to_ds, clean=False):
     Outputs
     - /galactica/data/raw_applications.json or /galactica/data/raw_is_experimental.json
     """
+
     # Identify the data
+    # TODO: remove all hard coded paths
     if Path(path_to_ds) == Path(r'./data/orig_applications.json'):
         data_type = 'applications'
     elif Path(path_to_ds) == Path(r'./data/orig_is_experimental.json'):
