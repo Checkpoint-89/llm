@@ -22,12 +22,12 @@ Zero-, one-, few shot classifiction
 
 Architecture:
     - Encoder only: embeds the input (ALBERT, BERT, DistilBERT, ELECTRA, RoBERTa)
-    - Decoder only: genrate text with only the input as constraint (CTRL, GPT, GPT-2, Transformer XL)
+    - Decoder only: generate text with only the input as constraint (CTRL, GPT, GPT-2, Transformer XL)
     - Encoder Decoder: seq to seq (BART, mBART, Marian, T5)
 
 
 Use models with HF
-    - The path to the model description can be provided as a checkpoint or as a path to a local file
+    - To access the model description: checkpoint or path to a local file
     - The description shall contain the config.json file and a the pytorch_model.bin
     - The config.json file contains:
         - The config class, which contains
@@ -36,7 +36,7 @@ Use models with HF
     - The Model class and its config file allow to instantiate the model
     - The pytoch_model.bin file allow to initialize the model with the pretrained weights
 
-    - Use AutoConfig, AutoTokenizer, AutoModel or with specialized head for instance: AutoModelForSequenceClassification
+    - use AutoConfig, AutoTokenizer, AutoModel or with specialized head for instance: AutoModelForSequenceClassification
     - method to load checkpoints: .from_pretrained()
     - method to save a model: .save_pretrained() -> config.json (the architecture); pytorch_model.bin (the weights)
     - NOTE: all transformers model will return the loss when labels are provided.
@@ -71,3 +71,5 @@ Batching Sequences
     - Padding token id: tokenizer.pad_token_id
     - The attention_mask output of the Tokenizer are used to inform the model not to pay attention to padding
     - The token_type_ids output of the Tokenizer are used to inform the model about the tokens. For instance, when processing pairs of sentences, it will indicate whether the token belongs to the first or second sentence.
+
+
