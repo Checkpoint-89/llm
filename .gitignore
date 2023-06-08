@@ -22,6 +22,4 @@ galactica/data
 galactica/state_dict
 galactica/test-trainer
 galactica/test.ipynb
-
-
-
+galactica/wandb
