@@ -28,7 +28,7 @@ from src.setup_train import do_preprocess_orig_data, subset_ratio, do_tokenize_d
 from src.setup_train import test_size, valid_size
 from src.setup_train import seed
 from src.setup_train import ModelClass, checkpoint, num_hidden_layers
-from src.setup_train import transformer_head_name, transformer_max_seq_length
+#from src.setup_train import transformer_head_name, transformer_max_seq_length
 from src.setup_train import training_arguments_kw
 import src.preprocess_data
 reload(src.preprocess_data)
@@ -79,37 +79,83 @@ print("Number of labels: ", num_labels)
 print('\n' + '*'*50)
 print("Instantiating the model")
 model = ModelClass.from_pretrained(checkpoint, num_labels=num_labels, num_hidden_layers=num_hidden_layers)
-if device.type == 'cuda':
-    #TODO: understand how to simplify this instantiation
-    state_dict = model.state_dict()
-    torch.save(state_dict, str(path_to_state_dict))
-    config = AutoConfig.from_pretrained(checkpoint, num_labels=num_labels, num_hidden_layers=num_hidden_layers)
-    with init_empty_weights():
-        model = ModelClass._from_config(config)
-    model.tie_weights()
-    no_split_module_classes = None #List of modules with any residual connection of some kind
-    model = load_checkpoint_and_dispatch(model, str(path_to_state_dict), device_map="auto", no_split_module_classes=no_split_module_classes)
+# if device.type == 'cuda':
+#     #TODO: understand how to simplify this instantiation
+#     state_dict = model.state_dict()
+#     torch.save(state_dict, str(path_to_state_dict))
+#     config = AutoConfig.from_pretrained(checkpoint, num_labels=num_labels, num_hidden_layers=num_hidden_layers)
+#     with init_empty_weights():
+#         model = ModelClass._from_config(config)
+#     model.tie_weights()
+#     no_split_module_classes = None #List of modules with any residual connection of some kind
+#     model = load_checkpoint_and_dispatch(model, str(path_to_state_dict), device_map="auto", no_split_module_classes=no_split_module_classes)
 print("\nModel instantiated")
+
+############################################
+# Get the model head parameters names
+print('\n' + '*'*50)
+print("Retrieve the model head parameters names")
+def get_model_head(model):
+    prefix = model.base_model_prefix
+    named_parameters = model.named_parameters()
+    return [p[0] for p in named_parameters if prefix not in p[0][0:len(prefix)]]
+model_head = get_model_head(model)
+print("\nModel head parameters names: ", model_head)
+print("\nModel head parameters names retrieved")
 
 ############################################
 # Freeze the model but the last layer
 print('\n' + '*'*50)
 print("Freezing the parameters")
 for param in model.named_parameters():
-    if param[0] != transformer_head_name:
+    if param[0] not in model_head:
         param[1].requires_grad = False
 print("\nParameters frozen")
+
+############################################
+# Control whether the head is frozen or not
+print('\n' + '*'*50)
+print("Checking whether the head is frozen or not")
+head_is_frozen = False
+for param in model_head:
+    if model.get_parameter(param).requires_grad == False:
+        head_is_frozen = True
+print("\nHead is frozen: ", head_is_frozen)
+print("\nControl of the head frozen status done")
 
 ############################################
 # Load the Tokenizer
 print('\n' + '*'*50)
 print("Instantiating the tokenizer")
+transformer_max_seq_length = model.config.max_position_embeddings
 tokenizer = AutoTokenizer.from_pretrained(checkpoint, use_fast=False)
-id2label = {i: label for label, i in tokenizer.vocab.items()}
-pad_token_id = model.config.pad_token_id
-tokenizer.add_special_tokens({'pad_token': id2label[pad_token_id]})
-tokenizer.model_max_length = transformer_max_seq_length
 print("\nTokenizer instantiated")
+
+
+############################################
+# This is a workaround to avoid the following error:
+#   ValueError: Asking to pad but the tokenizer does not have a padding token. 
+#   Please select a token to use as `pad_token`
+#   `(tokenizer.pad_token = tokenizer.eos_token e.g.)`
+#   or add a # new pad token via `tokenizer.add_special_tokens({'pad_token': '[PAD]'})`.
+print('\n' + '*'*50)
+print("Ensuring pad_token is defined in tokenizer.special_tokens_maps")
+if 'pad_token' not in tokenizer.special_tokens_map:
+    print("pad_token not in the tokenizer special characters")
+    print("Adding pad_token to the tokenizer special characters")
+    id2label = {i: label for label, i in tokenizer.vocab.items()}
+    if model.config.pad_token_id is not None:
+        id = model.config.pad_token_id
+        print("\tpad_token_id is defined in model.config: ", id)
+        print(f"\tcorresponding token in the vocabulary: {id2label[id]}")
+        tokenizer.add_special_tokens({'pad_token': id2label[id]})
+        print("pad_token added to the tokenizer special characters")
+        print("tokenizer: ", tokenizer)
+    else:
+        raise ValueError("model.config.pad_token_id not defined.")
+else:
+    print("pad_token already in the tokenizer special characters")
+print("\nCheck for pad_token done")
 
 ############################################
 if do_tokenize_data:
@@ -185,7 +231,7 @@ print("\n output_dir: ", output_dir)
 print("\n logging_dir: ", logging_dir)
 print("\nTrainingArguments instantiated")
 
-# Set-up Tensorboard SummaryWriter
+
 print('\n' + '*'*50)
 print("Set-up Tensorboard SummaryWriter to enrich training information")
 

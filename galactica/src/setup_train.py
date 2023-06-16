@@ -9,7 +9,8 @@ from transformers import AutoModelForSequenceClassification, OPTForSequenceClass
 ##########################
 
 # paths to the root folder of the project
-my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
+# my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
+my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
 
 # whether to clear directories
 clear_state_dict_dir = False            # whether to clear the directory of the state_dict
@@ -19,11 +20,11 @@ clear_tensor_board_directory = False    # whether to clear the tensorboard direc
 my_data = 'applications'                # on what to work: 'is_experimental' or 'applications'
 
 # preprocessing
-do_preprocess_orig_data = False         # whether to preprocess the original data into raw data
+do_preprocess_orig_data = True         # whether to preprocess the original data into raw data
 clear_raw_data = False                  # whether to clear existing data when repreprocessing
 
 # tokenizing
-do_tokenize_data = False                # whether to tokenize the raw data into tokenized data
+do_tokenize_data = True                # whether to tokenize the raw data into tokenized data
 # transformer_max_seq_length = 1024       # This has been replaced with a programmatic setup in the code
                                         # => test showed 4096 is okay for the tokenizer, but may be the reason for the training top fail
                                         # TODO: investigate the impact of this parameter on the the training of OPTForSequenceClassification
@@ -121,8 +122,14 @@ raw_applications = Path(r'./data/raw_applications.json')
 raw_is_experimental = Path(r'./data/raw_is_experimental.json')
 
 # path to the tokenized datasets
-tokenized_applications = Path(r'./data/tokenized_applications.json')
-tokenized_is_experimental = Path(r'./data/tokenized_is_experimental.json')
+if checkpoint == "facebook/galactica-125m":
+    tokenized_applications = Path(r'./data/galactica-125m/tokenized_applications.json')
+    tokenized_is_experimental = Path(r'./data/galactica-125m/tokenized_is_experimental.json')
+elif checkpoint == "allenai/scibert_scivocab_uncased":
+    tokenized_applications = Path(r'./data/scibert_scivocab_uncased/tokenized_applications.json')
+    tokenized_is_experimental = Path(r'./data/scibert_scivocab_uncased/tokenized_is_experimental.json')
+else:
+    raise ValueError("checkpoint not recognized")
 
 # path to the model state_dict
 path_to_state_dict = Path(r"./state_dict/model_state_dict.pt")
