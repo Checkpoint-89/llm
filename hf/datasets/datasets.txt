@@ -9,10 +9,13 @@ Loading Datasets: main methods from datasets
     - get_dataset_split_names: returns the splits available: train, validation, test
     - get_dataset_config_names: when datatsets have subsets, one shall select which subset to download or get an error
 
-Access data in the Dataset:
+Processing Datasets:
     - A dataset can be access through natural slicing and indexing operations
     - Indexing order matters: dataset[0]['text'] will be quicker than dataset["text"][0]...
     - ... because it retrieves all columns first.
+    - Tough: the corrsct way of doing it:
+        - methods on raws: sort, shuffle, select, filter, split, shard
+        - methods on columns: rename, remove, cast, flatten
 
 Preprocesssing datasets 
     - Tokenizing

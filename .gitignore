@@ -1,6 +1,7 @@
 # global
 **local**
 __pycache__
+todo.txt
 
 # root
 *.run
