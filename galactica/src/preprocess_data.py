@@ -3,7 +3,7 @@ import shutil
 import numpy as np
 from datasets import load_dataset, DatasetDict
 from datasets import Features, Value, Sequence, ClassLabel
-from .setup import norm_col_names, raw_data_col_names
+from .setup_train import norm_col_names, raw_data_col_names
 
 def split_dataset(dataset, test_size, valid_size=None):
 
@@ -54,11 +54,11 @@ def preprocess_orig_data(
     - /galactica/data/raw_applications.json or /galactica/data/raw_is_experimental.json
     """
     #TODO: Add distribution statistics as metadata to the dataset
-    
+
     # Clear the directory at raw_path
     if clear:
         shutil.rmtree(raw_path, ignore_errors=True)
-    
+
     # Load the data
     # Note: HF will
     #     - load the data
@@ -80,8 +80,7 @@ def preprocess_orig_data(
 
     # Preprocess dataset: encode labels
     # Labels are defined by the train split
-    # Note: np.unique -> returns the sorted unique elements of an array
-    labels = np.unique(dataset_dict['train']['_labels'])
+    labels = list(set(dataset_dict['train']['_labels']))
     label2id = {label: i for i, label in enumerate(labels)}
     label2id['[UNK]'] = -1
     id2label = {i: label for i, label in enumerate(labels)}
@@ -101,6 +100,9 @@ def preprocess_orig_data(
     'labels': ClassLabel(num_classes=len(label2id.values()), names=list(label2id.values())),
     })
     dataset_dict = dataset_dict.cast(features)
+
+    # Save the dataset
+    dataset_dict.save_to_disk(raw_path)
 
     # Save the dataset
     dataset_dict.save_to_disk(raw_path)

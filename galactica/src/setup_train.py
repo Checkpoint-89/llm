@@ -2,7 +2,7 @@ import os
 import shutil
 from pathlib import Path
 import torch
-from transformers import OPTForSequenceClassification
+from transformers import AutoModelForSequenceClassification, OPTForSequenceClassification
 
 ##########################
 # my specific setup
@@ -16,25 +16,36 @@ clear_state_dict_dir = False            # whether to clear the directory of the 
 clear_tensor_board_directory = False    # whether to clear the tensorboard directory
 
 # data to process
-my_data = 'applications'        # on what to work: 'is_experimental' or 'applications'
+my_data = 'applications'                # on what to work: 'is_experimental' or 'applications'
 
 # preprocessing
-do_preprocess_orig_data = False # whether to preprocess the original data into raw data
-clear_raw_data = False          # whether to clear existing data when repreprocessing
+do_preprocess_orig_data = False         # whether to preprocess the original data into raw data
+clear_raw_data = False                  # whether to clear existing data when repreprocessing
 
 # tokenizing
-do_tokenize_data = True         # whether to tokenize the raw data into tokenized data
-subset_ratio = {'train': 0.30, 'test': 0.10, 'validation': 0.10}            # what ratio of the raw data to consider
+do_tokenize_data = False                # whether to tokenize the raw data into tokenized data
+# transformer_max_seq_length = 1024       # This has been replaced with a programmatic setup in the code
+                                        # => test showed 4096 is okay for the tokenizer, but may be the reason for the training top fail
+                                        # TODO: investigate the impact of this parameter on the the training of OPTForSequenceClassification
+
+if my_data == 'applications':           # what ratio of the raw data to sample for the various intented treatment
+    subset_ratio = {'train': 0.30, 'test': 0.10, 'validation': 0.10}
+elif my_data == 'is_experimental':
+    subset_ratio = {'train': 0.15, 'test': 0.05, 'validation': 0.05}
+    
 
 # model
-ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
-checkpoint = "facebook/galactica-125m"  
-transformer_head_name = 'score.weight'
-num_hidden_layers = 12              # 12
-transformer_max_seq_length = 1024   # Note: self defined because it is not clear where it is set up and what it should be (test showed 4096 is ok)
+ModelClass = AutoModelForSequenceClassification
+checkpoint = "allenai/scibert_scivocab_uncased"
+
+# ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
+# checkpoint = "facebook/galactica-125m"
+
+# transformer_head_name = 'score.weight'    # This has been replaced with a programmatic setup in the code
+num_hidden_layers = 1                          # 12
 
 # training arguments
-my_seq_per_batch = 2
+my_seq_per_batch = 1
 # first value on the comment line is the default value
 training_arguments_kw = dict(
 run_name = 'test_run',                   # A descriptor for the run. Typically used for wandb and mlflow logging.
@@ -56,7 +67,7 @@ log_level = 'warning',                   # 'passive'~'warning', 'debug', 'info',
 log_level_replica = 'warning',           # 'passive'~'warning', 'debug', 'info', 'warning', 'error' and 'critical' /Logger log level to use on replicas.
 log_on_each_node = True,                 # True /In multinode distributed training, whether to log using log_level once per node, or only on the main node.
 logging_strategy = 'steps',              # 'steps', 'no', 'epoch /The logging strategy to adopt during training.
-logging_steps = 512,                     # 500 /Number of update steps between two logs if logging_strategy="steps". Should be an integer or a float in range [0,1).
+logging_steps = int(512/my_seq_per_batch), # 500 /Number of update steps between two logs if logging_strategy="steps". Should be an integer or a float in range [0,1).
 logging_first_step = False,              # False /Whether to log and evaluate the first global_step or not.
 logging_nan_inf_filter = True,           # True /Whether to filter out nan and inf losses for logging (replaced by average loss of the current window).
 #logging_dir,                            # output_dir/runs/CURRENT_DATETIME_HOSTNAME /Tensorboard log directory.
@@ -86,6 +97,8 @@ data_type = my_data
 ##########################
 dl_framework = 'pt'
 
+seed = None
+
 is_gpu = torch.cuda.is_available()
 if is_gpu:
     device = torch.device('cuda')
@@ -101,7 +114,7 @@ path_to_galactica_folder = my_path_to_galactica_folder
 
 # path from root to original data
 orig_applications = Path(r'./data/orig_applications.json')
-orig_is_experimental = Path(r'./data/raw_is_experimental.json')
+orig_is_experimental = Path(r'./data/orig_is_experimental.json')
 
 # path to raw data (preprocessed into a Dataset Dict)
 raw_applications = Path(r'./data/raw_applications.json')
@@ -133,6 +146,16 @@ norm_col_names = ['_labels', 'id', 'title', 'text']
 # train test split
 test_size = 0.1
 valid_size = 0.1
+
+##########################
+# experiment description
+##########################
+if data_type == 'applications':
+    description = 'applications'
+elif data_type == 'is_experimental':
+    description = 'is_experimental'
+else:
+    raise ValueError("Unknown data type !")
 
 ##########################
 # programmatic setup
