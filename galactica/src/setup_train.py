@@ -9,18 +9,18 @@ from transformers import AutoModelForSequenceClassification, OPTForSequenceClass
 ##########################
 
 # paths to the root folder of the project
-# my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
-my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
+my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
+# my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
 
 # whether to clear directories
 clear_state_dict_dir = False            # whether to clear the directory of the state_dict
 clear_tensor_board_directory = False    # whether to clear the tensorboard directory
 
 # data to process
-my_data = 'applications'                # on what to work: 'is_experimental' or 'applications'
+my_data = 'is_experimental'                # on what to work: 'is_experimental' or 'applications'
 
 # preprocessing
-do_preprocess_orig_data = True         # whether to preprocess the original data into raw data
+do_preprocess_orig_data = False         # whether to preprocess the original data into raw data
 clear_raw_data = False                  # whether to clear existing data when repreprocessing
 
 # tokenizing
@@ -36,17 +36,17 @@ elif my_data == 'is_experimental':
     
 
 # model
-ModelClass = AutoModelForSequenceClassification
-checkpoint = "allenai/scibert_scivocab_uncased"
+# ModelClass = AutoModelForSequenceClassification
+# checkpoint = "allenai/scibert_scivocab_uncased"
 
-# ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
-# checkpoint = "facebook/galactica-125m"
+ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
+checkpoint = "facebook/galactica-125m"
 
 # transformer_head_name = 'score.weight'    # This has been replaced with a programmatic setup in the code
-num_hidden_layers = 1                          # 12
+num_hidden_layers = 12                          # 12
 
 # training arguments
-my_seq_per_batch = 1
+my_seq_per_batch = 2
 # first value on the comment line is the default value
 training_arguments_kw = dict(
 run_name = 'test_run',                   # A descriptor for the run. Typically used for wandb and mlflow logging.
@@ -68,16 +68,16 @@ log_level = 'warning',                   # 'passive'~'warning', 'debug', 'info',
 log_level_replica = 'warning',           # 'passive'~'warning', 'debug', 'info', 'warning', 'error' and 'critical' /Logger log level to use on replicas.
 log_on_each_node = True,                 # True /In multinode distributed training, whether to log using log_level once per node, or only on the main node.
 logging_strategy = 'steps',              # 'steps', 'no', 'epoch /The logging strategy to adopt during training.
-logging_steps = int(512/my_seq_per_batch), # 500 /Number of update steps between two logs if logging_strategy="steps". Should be an integer or a float in range [0,1).
+logging_steps = int(2048/my_seq_per_batch), # 500 /Number of update steps between two logs if logging_strategy="steps". Should be an integer or a float in range [0,1).
 logging_first_step = False,              # False /Whether to log and evaluate the first global_step or not.
 logging_nan_inf_filter = True,           # True /Whether to filter out nan and inf losses for logging (replaced by average loss of the current window).
 #logging_dir,                            # output_dir/runs/CURRENT_DATETIME_HOSTNAME /Tensorboard log directory.
 
 evaluation_strategy='steps',             # 'no', 'epoch', 'steps' /The evaluation strategy to adopt during training.
-eval_steps=int(512/my_seq_per_batch),    # logging_steps /Number of update steps between two evaluations if evaluation_strategy="steps". Should be an integer or a float in range [0,1)
+eval_steps=int(2048/my_seq_per_batch),    # logging_steps /Number of update steps between two evaluations if evaluation_strategy="steps". Should be an integer or a float in range [0,1)
 
 save_strategy='steps',                   # 'steps', 'no', 'epoch' /The checkpoint save strategy to adopt during training.
-save_steps=int(512/my_seq_per_batch),    # 500 /Number of updates steps before two checkpoint saves if save_strategy="steps". Should be an integer or a float in range [0,1).
+save_steps=int(2048/my_seq_per_batch),    # 500 /Number of updates steps before two checkpoint saves if save_strategy="steps". Should be an integer or a float in range [0,1).
 save_total_limit = 10,                   # None /If a value is passed, will limit the total amount of checkpoints. Deletes the older checkpoints in output_dir.
 
 load_best_model_at_end = True,           # False /Whether or not to load the best model found during training at the end of training.
@@ -157,12 +157,7 @@ valid_size = 0.1
 ##########################
 # experiment description
 ##########################
-if data_type == 'applications':
-    description = 'applications'
-elif data_type == 'is_experimental':
-    description = 'is_experimental'
-else:
-    raise ValueError("Unknown data type !")
+description = str(Path(checkpoint, data_type))
 
 ##########################
 # programmatic setup
