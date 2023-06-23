@@ -48,10 +48,6 @@ def preprocess_orig_data(
         clear=False):
     """
     Preprocess the original data provided by Chiper Icon
-    Inputs
-    - /galactica/data/orig_applications.json or /galactica/data/orig_is_experimental.json
-    Outputs
-    - /galactica/data/raw_applications.json or /galactica/data/raw_is_experimental.json
     """
     #TODO: Add distribution statistics as metadata to the dataset
 
@@ -80,29 +76,19 @@ def preprocess_orig_data(
 
     # Preprocess dataset: encode labels
     # Labels are defined by the train split
-    labels = list(set(dataset_dict['train']['_labels']))
-    label2id = {label: i for i, label in enumerate(labels)}
-    label2id['[UNK]'] = -1
-    id2label = {i: label for i, label in enumerate(labels)}
-    id2label[-1] = '[UNK]'
+    labels = ['[UNK]']
+    labels.extend(list(set(dataset_dict['train']['labels'])))
 
-    dataset_dict = dataset_dict.map(lambda seq: {'labels': label2id[seq['_labels']] if seq['_labels'] in label2id.keys() else -1})
-    for split in dataset_dict.keys():
-        if split != 'train':
-            dataset_dict[split] = dataset_dict[split].map(lambda seq: {'_labels': id2label[seq['labels']]})
-
+    dataset_dict = dataset_dict.map(lambda seq: {'labels': seq['labels'] if seq['labels'] in labels else '[UNK]'})
+    
     # Preprocess dataset: cast to features
     features = Features({
-    '_labels': ClassLabel(num_classes=len(label2id.keys()), names=list(label2id.keys())),
     'id': Sequence(feature=Value(dtype='string', id=None), length=-1, id=None),
     'title': Value(dtype='string', id=None),
     'text': Value(dtype='string', id=None),
-    'labels': ClassLabel(num_classes=len(label2id.values()), names=list(label2id.values())),
+    'labels': ClassLabel(num_classes=len(labels), names=labels)
     })
     dataset_dict = dataset_dict.cast(features)
-
-    # Save the dataset
-    dataset_dict.save_to_disk(raw_path)
 
     # Save the dataset
     dataset_dict.save_to_disk(raw_path)

@@ -79,16 +79,6 @@ print("Number of labels: ", num_labels)
 print('\n' + '*'*50)
 print("Instantiating the model")
 model = ModelClass.from_pretrained(checkpoint, num_labels=num_labels, num_hidden_layers=num_hidden_layers)
-# if device.type == 'cuda':
-#     #TODO: understand how to simplify this instantiation
-#     state_dict = model.state_dict()
-#     torch.save(state_dict, str(path_to_state_dict))
-#     config = AutoConfig.from_pretrained(checkpoint, num_labels=num_labels, num_hidden_layers=num_hidden_layers)
-#     with init_empty_weights():
-#         model = ModelClass._from_config(config)
-#     model.tie_weights()
-#     no_split_module_classes = None #List of modules with any residual connection of some kind
-#     model = load_checkpoint_and_dispatch(model, str(path_to_state_dict), device_map="auto", no_split_module_classes=no_split_module_classes)
 print("\nModel instantiated")
 
 ############################################
@@ -238,7 +228,7 @@ print("Set-up Tensorboard SummaryWriter to enrich training information")
 from torch.utils.tensorboard import SummaryWriter
 tb_writer = SummaryWriter(logging_dir)
 
-def plot_label_stats(datasets, label_name='labels',  _label_name='_labels'):
+def plot_label_stats(datasets, label_name='labels'):
 
     import matplotlib.pyplot as plt
 
@@ -247,15 +237,15 @@ def plot_label_stats(datasets, label_name='labels',  _label_name='_labels'):
 
     for i, split in enumerate(datasets):
         dataset = datasets[split]
-        labels = dataset.features[label_name].names
-        _labels = dataset.features[_label_name].names
+        labels_str = dataset.features[label_name]._int2str
+        labels_int = dataset.features[label_name]._str2int
 
-        x = range(len(labels))
-        height = [dataset[label_name].count(label) for label in labels]
-        labs = [label for label in _labels]
-        ax[i].bar(x=x, height=height, align='center', label=labs)
+        x = range(len(labels_str))
+        height = [dataset['labels'].count(label) for label in labels_int.values()]
+        
+        ax[i].bar(x=x, height=height, align='center', label=labels_str)
         ax[i].set_xlabel(split)
-        ax[i].set_xticks(x, labs)
+        ax[i].set_xticks(x, labels_str)
     
     return (fig, ax)
 print("\nTensorboard SummaryWriter has been set-up")

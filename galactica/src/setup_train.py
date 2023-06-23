@@ -20,8 +20,8 @@ clear_tensor_board_directory = False    # whether to clear the tensorboard direc
 my_data = 'is_experimental'                # on what to work: 'is_experimental' or 'applications'
 
 # preprocessing
-do_preprocess_orig_data = False         # whether to preprocess the original data into raw data
-clear_raw_data = False                  # whether to clear existing data when repreprocessing
+do_preprocess_orig_data = True         # whether to preprocess the original data into raw data
+clear_raw_data = True                  # whether to clear existing data when repreprocessing
 
 # tokenizing
 do_tokenize_data = True                # whether to tokenize the raw data into tokenized data
@@ -148,7 +148,7 @@ path_to_tensorboard_dir = Path(path_to_training_dir, 'runs')
 # column names of the original data and normalized form
 col_names_applications = ['application', 'ids', 'section_title', 'section_text']
 col_names_is_experimental = ['is_experimental_section', 'ids', 'section_title', 'section_text']
-norm_col_names = ['_labels', 'id', 'title', 'text']
+norm_col_names = ['labels', 'id', 'title', 'text']
 
 # train test split
 test_size = 0.1
