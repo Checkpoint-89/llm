@@ -13,8 +13,8 @@ make_tensors = True # Compute embeddings vectors
 make_metadata = True # Compute metadata
 
 # paths to the root folder of the project
-# my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
-my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
+my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
+# my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
 
 # data to process
 my_data = 'applications'                # on what to work: 'is_experimental' or 'applications'
