@@ -2,7 +2,7 @@ import os
 import shutil
 from pathlib import Path
 import torch
-from transformers import AutoModelForSequenceClassification, OPTForSequenceClassification
+from transformers import AutoModelForSequenceClassification, OPTForSequenceClassification, OPTForCausalLM, OPTModel
 
 ##########################
 # my specific setup
@@ -13,8 +13,8 @@ make_tensors = True # Compute embeddings vectors
 make_metadata = True # Compute metadata
 
 # paths to the root folder of the project
-my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
-# my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
+# my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
+my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
 
 # data to process
 my_data = 'applications'                # on what to work: 'is_experimental' or 'applications'
@@ -23,9 +23,10 @@ my_data = 'applications'                # on what to work: 'is_experimental' or 
 # ModelClass = AutoModelForSequenceClassification
 # checkpoint = "allenai/scibert_scivocab_uncased"
 
-ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
+ModelClass = OPTModel # OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
 model_type = r'facebook/galactica-125m'
-checkpoint = Path("./test-trainer/output_dir/facebook/galactica-125m/applications/Jun16_20-19-30_instance-1/checkpoint-14336")
+checkpoint = r'facebook/galactica-125m'
+# checkpoint = Path("./test-trainer/output_dir/facebook/galactica-125m/applications/Jun16_20-19-30_instance-1/checkpoint-14336")
 
 ##########################
 # data
