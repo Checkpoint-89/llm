@@ -20,7 +20,7 @@ clear_tensor_board_directory = False    # whether to clear the tensorboard direc
 my_data = 'is_experimental'                # on what to work: 'is_experimental' or 'applications'
 
 # preprocessing
-do_preprocess_orig_data = True         # whether to preprocess the original data into raw data
+do_preprocess_orig_data = False         # whether to preprocess the original data into raw data
 clear_raw_data = True                  # whether to clear existing data when repreprocessing
 
 # tokenizing
@@ -36,11 +36,11 @@ elif my_data == 'is_experimental':
     
 
 # model
-# ModelClass = AutoModelForSequenceClassification
-# checkpoint = "allenai/scibert_scivocab_uncased"
+ModelClass = AutoModelForSequenceClassification
+checkpoint = "allenai/scibert_scivocab_uncased"
 
-ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
-checkpoint = "facebook/galactica-125m"
+# ModelClass = OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
+# checkpoint = "facebook/galactica-125m"
 
 # transformer_head_name = 'score.weight'    # This has been replaced with a programmatic setup in the code
 num_hidden_layers = 12                          # 12
