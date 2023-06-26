@@ -68,8 +68,12 @@ def preprocess_orig_data(
     # Preprocess dataset: standardize column names
     src_cols = list(dataset_dict['train'].features.keys())
     assert src_cols == raw_data_col_names, "column names or order have changed !"
-
     dataset_dict['train'] = rename_ds_columns(dataset_dict['train'], src_cols, tgt_cols)
+
+    # Make sure the labels are strings
+    new_features = dataset_dict['train'] .features.copy()
+    new_features['labels'] = Value('string')
+    dataset_dict = dataset_dict.cast(new_features)
 
     # Preprocess dataset: split the dataset
     dataset_dict = split_dataset(dataset_dict['train'], test_size, valid_size)

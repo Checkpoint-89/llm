@@ -13,20 +13,29 @@ make_tensors = True # Compute embeddings vectors
 make_metadata = True # Compute metadata
 
 # paths to the root folder of the project
-# my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
-my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
+my_path_to_galactica_folder = Path(r'/home/cedric.dietzi/projects/galactica') # path to root folder
+# my_path_to_galactica_folder = Path(r'D:\Users\cdiet\Documents\projects\llm\galactica') # path to root folder
 
 # data to process
 my_data = 'applications'                # on what to work: 'is_experimental' or 'applications'
 
 # model
 # ModelClass = AutoModelForSequenceClassification
-# checkpoint = "allenai/scibert_scivocab_uncased"
+# model_type = r'allenai/scibert_scivocab_uncased'
+# checkpoint_model = "allenai/scibert_scivocab_uncased"
+# checkpoint_tokenizer = None
 
 ModelClass = OPTModel # OPTForSequenceClassification # https://huggingface.co/docs/transformers/model_doc/opt#opt
 model_type = r'facebook/galactica-125m'
-checkpoint = r'facebook/galactica-125m'
-# checkpoint = Path("./test-trainer/output_dir/facebook/galactica-125m/applications/Jun16_20-19-30_instance-1/checkpoint-14336")
+checkpoint_model = r'facebook/galactica-125m'
+checkpoint_tokenizer = Path("./test-trainer/output_dir/facebook/galactica-125m/applications/Jun16_20-19-30_instance-1/checkpoint-14336")
+
+if Path(checkpoint_model).exists(): # If checkpoint_model exists, it is assumed that the tokenizer is saved in the same location
+    checkpoint_tokenizer = checkpoint_model
+if not Path(checkpoint_tokenizer).exists():
+    raise ValueError("checkpoint_tokenizer not found")
+
+# checkpoint_model = Path("./test-trainer/output_dir/facebook/galactica-125m/applications/Jun16_20-19-30_instance-1/checkpoint-14336")
 
 ##########################
 # data
@@ -62,10 +71,10 @@ raw_applications = Path(r'./data/raw_applications.json')
 raw_is_experimental = Path(r'./data/raw_is_experimental.json')
 
 # path to the tokenized datasets
-if "facebook/galactica-125m" in str(checkpoint):
+if "facebook/galactica-125m" in str(checkpoint_model):
     tokenized_applications = Path(r'./data/galactica-125m/tokenized_applications.json')
     tokenized_is_experimental = Path(r'./data/galactica-125m/tokenized_is_experimental.json')
-elif "allenai/scibert_scivocab_uncased" in str(checkpoint):
+elif "allenai/scibert_scivocab_uncased" in str(checkpoint_model):
     tokenized_applications = Path(r'./data/scibert_scivocab_uncased/tokenized_applications.json')
     tokenized_is_experimental = Path(r'./data/scibert_scivocab_uncased/tokenized_is_experimental.json')
 else:
