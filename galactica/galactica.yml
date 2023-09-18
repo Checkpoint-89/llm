@@ -2,9 +2,9 @@ name: galactica
 
 channels:
   - default
+  - conda-forge
   - plotly
-  - conda-forge 
-
+ 
 dependencies:
   - python
   - ipykernel
@@ -12,6 +12,7 @@ dependencies:
   - scipy
   - plotly
   - matplotlib
+  - openai
   - pip
   - pip:
     - transformers==4.28.0
@@ -20,3 +21,4 @@ dependencies:
     - evaluate
     - google-cloud-storage
     - tensorboard
+
